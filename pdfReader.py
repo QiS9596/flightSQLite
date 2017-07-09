@@ -66,7 +66,8 @@ def deleteFiles():
 #     print(e.object)
 #
 def handlePage(page):
-    pass
+    Titles = page.findAll("div",{"class":re.compile("(t m0 .* ffb.*)")})
+
 
 html = open("./ANA domestic.html",encoding='utf-8')
 bs = BeautifulSoup(html,"lxml")
