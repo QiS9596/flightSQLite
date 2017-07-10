@@ -1,49 +1,6 @@
 
-# import textract
-# import codecs
-#
-# def readPdfToTextInUTF8(pdfPathAsInput, txtNameAsOutput = "output.txt"):
-#     text = textract.process(pdfPathAsInput)
-#     strResult = text.strip().decode('utf-8')
-#     file = codecs.open(txtNameAsOutput,'w','utf-8')
-#     file.write(strResult)
-#     file.close()
-#
-# def readPdfToHtml(pdfPathAsInput):
-#     pass
-#
-# file = codecs.open("output.txt","r","utf-8")
-# for line in file.readlines():
-#     print(line)
-# file.close()
-
-#printerr(text)
-
-
-
 #subprocess.call(('pdf2htmlEX','ANA domestic.pdf'))
 
-"""
-from pdfminer.pdfinterp import PDFResourceManager, process_pdf
-from pdfminer.converter import TextConverter
-from pdfminer.layout import LAParams
-from io import StringIO
-def convert_pdf(path, page=1):
-    rsrcmgr = PDFResourceManager()
-    retstr = StringIO()
-    laparams = LAParams()
-    device = TextConverter(rsrcmgr, retstr, pageno=page,  laparams=laparams)
-    fp = open(path, 'rb')
-    process_pdf(rsrcmgr, device, fp)
-    fp.close()
-    device.close()
-    str = retstr.getvalue()
-    retstr.close()
-    return str
-
-file  = r'ANA domestic.pdf'
-print(convert_pdf(file))
-"""
 
 from bs4 import BeautifulSoup
 from bs4 import UnicodeDammit
@@ -51,6 +8,50 @@ from urllib.request import urlopen
 import re
 import sys
 
+class shortedTag:
+    def __init__(self,x1,y1,y2,text):
+        if(type(x1) ==  type("")):
+            self.x1 = int(x1[1:x1.__len__()],16)
+            self.y1 = int(y1[1:y1.__len__()],16)
+            self.y2 = int(y2[1:y2.__len__()],16)
+        self.text = text
+
+    x1 = None
+    y1 = None
+    y2 = None
+    text = None
+
+    def compareTo(self, other, flag):
+        if flag == "x":
+            return self.x1-other.x1
+        if flag == "y":
+            return self.y2-other.y2
+
+    def getValue(self,flag):
+        if flag == "x":
+            return self.x1
+        if flag == "y":
+            return self.y2
+
+    @staticmethod
+    def sortShortedTagList(list,flag):
+        for index in range(0,list.__len__()):
+            minidx = index
+            min = list[index].getValue(flag)
+            for indexa in range(index, list.__len__()):
+                if list[indexa].getValue(flag)<min:
+                    minidx = indexa
+                    min = list[minidx].getValue(flag)
+            temp = list[index]
+            list[index] = list[min]
+            list[min] = temp
+        return list
+
+
+
+
+result = {}
+handledResult = {}
 def deleteFiles():
     html = open("./ANA domestic.html",encoding='utf-8')
     data = re.sub("(<img).*(\"\/>)","",html.read())
@@ -59,14 +60,25 @@ def deleteFiles():
     html.write(data)
     html.flush()
     html.close()
-# html = html.decoding('ascii').encoding('utf-8')
-# try:
-#     bs = BeautifulSoup(html,"lxml")
-# except UnicodeDecodeError as e:
-#     print(e.object)
-#
+
 def handlePage(page):
-    Titles = page.findAll("div",{"class":re.compile("(t m0 .* ffb.*)")})
+    Titles = page.findAll("div",{"class":re.compile("(t m0 .* ffb fs25.*)")})
+    Times = page.findAll("div",{"class":re.compile("(t me .* ffd fs24.*)")})
+    if Titles.__len__()>=1:
+        result[page["data-page-no"]] = {}
+        result[page["data-page-no"]]["titles"] = []
+        result[page["data-page-no"]]["times"] = []
+    for title in Titles:
+        #print(title)
+        info = title["class"]
+
+        result[page["data-page-no"]]["titles"].append(shortedTag(info[2],info[3],info[4],title.text))
+
+
+    for time in Times:
+        info = time["class"]
+        result[page["data-page-no"]]["times"].append(shortedTag(info[2],info[3],info[4],title.text))
+
 
 
 html = open("./ANA domestic.html",encoding='utf-8')
@@ -74,7 +86,9 @@ bs = BeautifulSoup(html,"lxml")
 pages = bs.findAll("div",{"class":re.compile("pf(.)*")})
 for page in pages:
     handlePage(page)
+for a in result.keys():
+    handledResult[a] = {}
+    #handledResult[a]["Titles"] = []
 
 
-# for b in a:
-#    print(b)
+
