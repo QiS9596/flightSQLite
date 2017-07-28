@@ -42,3 +42,26 @@ class MileageDBManager:
             if (FullMileage == a[2]) and ((cityName1 in a[0] and cityName2 in a[1]) or (cityName1 in a[1] and cityName2 in a[0])):
                 return True
         return False
+
+    def refactorConnList(self):
+        connectList = self.conn.execute("""
+            SELECT * FROM CONNECT
+        """)
+        for a in connectList:
+            self.conn.execute("""
+            UPDATE CONNECT
+            SET CITY2 = ?
+            WHERE CITY1 = ? AND CITY2 = ? AND MILEAGEFULL = ?
+        """,[a[1].lower(),a[0],a[1],a[2]])
+        self.conn.commit()
+
+    def refactorCityList(self):
+        connectList = self.conn.execute("""
+            SELECT *  FROM CONNECT
+        """)
+        citylist = self.conn.execute("""
+            SELECT * FROM CITY
+        """)
+        for a in connectList:
+            lower = a[1].lower()
+            self.insertNewCity(lower)
