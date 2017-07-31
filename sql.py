@@ -2,6 +2,9 @@ import sqlite3
 import random
 
 class MileageDBManager:
+    """
+    Database Manager for maintaining a sqlite database table for Mileage infomation
+    """
     conn = None
     def __init__(self):
         self.conn = sqlite3.connect('text.db')
@@ -65,8 +68,12 @@ class MileageDBManager:
             lower = a[1].lower()
             self.insertNewCity(lower)
 
-class FlightDBManager:
 
+class FlightDBManager:
+    """
+    Use to maintain a temporary sqlite database table for flighte,
+    capable for generating random flight for algorithm tests
+    """
     conn = None
     def __init__(self):
         self.conn = sqlite3.connect("text.db")
@@ -90,6 +97,13 @@ class FlightDBManager:
         return False
 
     def randomGenarateFlight(self,num,startFlightNO):
+        """
+        Call this method to generate random flights and insert them into sql
+        will generate journey to and fro
+        :param num: the number of flights you want to generate
+        :param startFlightNO: the start of the flightNO, the flightNO increases for the following flights
+        :return:
+        """
         connect = list(self.conn.execute("""
             SELECT * FROM CONNECT
         """))
