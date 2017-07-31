@@ -65,3 +65,28 @@ class MileageDBManager:
         for a in connectList:
             lower = a[1].lower()
             self.insertNewCity(lower)
+
+class FlightDBManager:
+    conn = None
+    def __init__(self):
+        self.conn = sqlite3.connect("text.db")
+
+    def insertNewFlight(self,depatureCity, arrivalCity, depatureTime, arrivalTime, mileage, FlightNO):
+        if self.flightInDatabase(FlightNO):
+            return
+        self.conn.execute("""
+            INSERT INTO FLIGHT(DEPATURECITY,DESTINATIONCITY,DEPATURETIME,ARRIVALTIME,MILEAGEFULL,FLIGHTNO)
+            VALUES (?,?,?,?,?,?)
+        """,[depatureCity,arrivalCity,depatureTime,arrivalTime,mileage,FlightNO])
+        self.conn.commit()
+
+    def flightInDatabase(self,FlightNO):
+        flightlist = self.conn.execute("""
+            SELECT * FROM FLIGHT
+        """)
+        for flight in flightlist:
+            if FlightNO in flight:
+                return True
+        return False
+
+    
