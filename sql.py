@@ -1,5 +1,6 @@
 import sqlite3
 import random
+import datetime
 
 class MileageDBManager:
     """
@@ -146,3 +147,18 @@ class DateStringGenerator:
                 else:
                     result = result + str(min)
                 return result
+
+    @staticmethod
+    def earlyThan(time1,time2):
+        time1 = time1.split(":")
+        time2 = time2.split(":")
+        if time1[0]<time2[0]:
+            return True
+        elif time1[1]<time2[1]:
+            return True
+        else: return False
+
+    @staticmethod
+    def toDateObject(time,year,month,day):
+        date_str = str(year)+"-"+str(month)+"-"+str(day)+" "+time
+        return datetime.datetime.strptime(date_str,"%Y-%m-%d %H:%M")
