@@ -88,6 +88,13 @@ class FlightDBManager:
         """,[depatureCity,arrivalCity,depatureTime,arrivalTime,mileage,FlightNO])
         self.conn.commit()
 
+    def getAvaliableFlightList(self,depature_city_name):
+        city = depature_city_name.lower()
+        return self.conn.execute("""
+            SELECT * FROM FLIGHT
+            WHERE DEPATURECITY = ?
+        """,[city])
+
     def flightInDatabase(self,FlightNO):
         flightlist = self.conn.execute("""
             SELECT * FROM FLIGHT
@@ -154,7 +161,7 @@ class DateStringGenerator:
         time2 = time2.split(":")
         if time1[0]<time2[0]:
             return True
-        elif time1[1]<time2[1]:
+        elif time1[0] == time2[0] and time1[1]<time2[1]:
             return True
         else: return False
 
