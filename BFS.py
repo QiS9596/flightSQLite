@@ -133,13 +133,13 @@ def BFS(StartCity,EndCity):
   for a in result:#get all of these maximum value together and return the one with maximum value
     pq.put_nowait((-a.eval(),a))
   return pq.get_nowait()[1]
-
-start_city = city("miyazaki")
-end_city = city("okinawa")
-startDatetime = datetime.datetime.now()
-endDatetime = startDatetime + datetime.timedelta(days=2)
-history = BFS(start_city,end_city).flightHistory
-for ticket in history:
-    print(ticket.departureTime)
-    print(ticket.arrivalTime)
-    print(ticket.flightNO)
+def test():
+    start_city = city("miyazaki")
+    end_city = city("okinawa")
+    startDatetime = datetime.datetime.now()
+    endDatetime = startDatetime + datetime.timedelta(days=2)
+    history = BFS(start_city,end_city).flightHistory
+    for ticket in history:
+        print(ticket.departureTime)
+        print(ticket.arrivalTime)
+        print(ticket.flightNO)
