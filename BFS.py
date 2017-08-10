@@ -16,35 +16,40 @@ def earlyTo(datetime1,datetime2):
     else: return False
 
 class flight:
-    arrivalTime = None
-    depatureTime = None
+    """
+    flight class that holds the information of a single flight
+    this class get %H:%M and a datetime object as date input,
+    and set the flight's departure and arrival time with them
+    """
+    arrivalTime = None #
+    departureTime = None
     flightNO = None
     Mileage = None
     destination = None
-    depatureCity = None
-    def __init__(self,depature_time_str,arrival_time_str,flightNO,Mileage,destination,depatureCity,current_date):
+    departureCity = None
+    def __init__(self, departure_time_str, arrival_time_str, flightNO, Mileage, destination, departureCity, current_date):
         self.flightNO = flightNO
         self.Mileage = Mileage
         self.destination = destination
-        self.depatureCity = depatureCity
+        self.departureCity = departureCity
         year = current_date.year
         month = current_date.month
         day = current_date.day
-        self.depatureTime = sql.DateStringGenerator.toDateObject(depature_time_str,year,month,day)
+        self.departureTime = sql.DateStringGenerator.toDateObject(departure_time_str, year, month, day)
         self.arrivalTime = sql.DateStringGenerator.toDateObject(arrival_time_str,year,month,day)
-        if sql.DateStringGenerator.earlyThan(arrival_time_str,depature_time_str):
+        if sql.DateStringGenerator.earlyThan(arrival_time_str, departure_time_str):
             self.arrivalTime= self.arrivalTime + datetime.timedelta(days = 1)
 
 class city:
     city_name = None
     def __init__(self,city_name):
         self.city_name = city_name
-    def getDepatureFlight(self,current_date):
+    def getDepartureFlight(self, current_date):
         flightList = list(flightDBManager.getAvaliableFlightList(self.city_name))
         result = []
         for f in flightList:
             current_flight = flight(f[2],f[3],f[5],f[4],f[1],f[0],current_date)
-            if earlyTo(current_date,current_flight.depatureTime):
+            if earlyTo(current_date, current_flight.departureTime):
                 result.append(current_flight)
         return result
 
@@ -63,7 +68,7 @@ class node:
     if not currentairport == None:
         self.currentairport = currentairport
         return
-    if earlyTo(history.currentDatetime,flight.depatureTime):
+    if earlyTo(history.currentDatetime,flight.departureTime):
         self.flightHistory = history.flightHistory[:]
         self.flightHistory.append(flight)
         self.val += flight.Mileage
@@ -115,8 +120,8 @@ def BFS(StartCity,EndCity):
     current = pq.get_nowait()[1]
     last = current.eval()
     resultflag = True
-    for flight in current.currentairport.getDepatureFlight(current.currentDatetime):
-      if earlyTo(current.currentDatetime,flight.depatureTime):
+    for flight in current.currentairport.getDepartureFlight(current.currentDatetime):
+      if earlyTo(current.currentDatetime,flight.departureTime):
         newNode = node(history=current,flight=flight)
         if newNode.eval() > last: #if some value of the desendents of current node is greater than current, it won't be a maximum
           resultflag = False
@@ -135,5 +140,6 @@ startDatetime = datetime.datetime.now()
 endDatetime = startDatetime + datetime.timedelta(days=2)
 history = BFS(start_city,end_city).flightHistory
 for ticket in history:
-    print(ticket.depatureTime)
+    print(ticket.departureTime)
+    print(ticket.arrivalTime)
     print(ticket.flightNO)
