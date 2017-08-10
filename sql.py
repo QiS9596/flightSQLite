@@ -140,6 +140,12 @@ class FlightDBManager:
             self.insertNewFlight(depature_city,arrival_city,depature_time,arrival_time,mileage,FlightNO)
             self.insertNewFlight(depature_city,arrival_city,depature_time,arrival_time,mileage,FlightNO)
 
+    def getEntireFlightList(self):
+        result = self.conn.execute("""
+            SELECT * FROM FLIGHT
+        """)
+        return result
+
 class DateStringGenerator:
     @staticmethod
     def numToDateStr(hour,min):

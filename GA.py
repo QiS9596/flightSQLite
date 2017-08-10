@@ -15,7 +15,10 @@ class Node:
     class table:
 
         def __init__(self):
-            pass
+            flights = sql.FlightDBManager().getEntireFlightList()
+            self.flightTable = []
+            for f in flights:
+                flight = BFS.flight()
         def getStartCity(self):
             pass
         def getFinalCity(self):
