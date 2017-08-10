@@ -5,6 +5,8 @@ import datetime
 
 TIME_CONFLICT_WEIGHT = 1000
 DESTINATION_CONFLICT_WEIGHT = 1000
+DEPARTURE_CITY = None
+ARRIVAL_CITY = None
 
 class Node:
     """
@@ -24,7 +26,26 @@ class Node:
             print(a.getTableDate())
 
     def eval(self):
-        pass
+        result = 0
+        for ele in self.tables:
+            result += ele.eval()
+        for i in range(0, self.tables.__len__()):
+
+            if i+1 < self.tables.__len__():
+                if not BFS.earlyTo(self.tables[i].getFinalFlight().arrivalTime,
+                                   self.tables[i+1].getFirstFlight().departureTime):
+                    result -= TIME_CONFLICT_WEIGHT
+                if not self.tables[i].getFinalFlight().destination == self.tables[i+1].getFirstFlight().departureCity:
+                    result -= DESTINATION_CONFLICT_WEIGHT
+        if not self.tables[0].getFirstFlight().departureCity == DEPARTURE_CITY:
+            result -= DESTINATION_CONFLICT_WEIGHT
+        if not self.tables[-1].getFinalFlight().destination == ARRIVAL_CITY:
+            result -= DESTINATION_CONFLICT_WEIGHT
+        if not BFS.earlyTo(self.startDate,self.tables[0].getFirstFlight().departureTime):
+            result -= TIME_CONFLICT_WEIGHT
+        if not BFS.earlyTo(self.tables[-1].getFinalFlight().arrivalTime,self.endDate):
+            result -= TIME_CONFLICT_WEIGHT
+        return result
 
     class table:
 
@@ -35,6 +56,8 @@ class Node:
             for f in flights:
                 flight = BFS.flight(f[2],f[3],f[5],f[4],f[1],f[0],currentDate)
                 self.flightTable.append(self.tableElement(flight,randint(0,1)))
+            self.earliestFlight = None
+            self.latestFlight = None
         def eval(self):
             result = 0
             self.earliestDate = datetime.datetime(year=self.currentDate.year, month= self.currentDate.month, day=self.currentDate.day,
@@ -86,3 +109,6 @@ class Node:
 
 a = Node.table(datetime.datetime.now())
 print(a.eval())
+
+b = Node(datetime.datetime.now(),datetime.datetime.now()+datetime.timedelta(days = 5))
+print(b.eval())
