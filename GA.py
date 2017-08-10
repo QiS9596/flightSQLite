@@ -1,12 +1,27 @@
 import BFS
 import sql
 from random import randint
+from random import random
 import datetime
 
+MUTATION_PROB = 0.05
+EVALUATION_INITIAL_GUESS = 10000
 TIME_CONFLICT_WEIGHT = 1000
 DESTINATION_CONFLICT_WEIGHT = 1000
+MAX_ITERATION_LIMIT = 500
 DEPARTURE_CITY = None
 ARRIVAL_CITY = None
+HORDE_SIZE = 50
+
+def prob_int(part, total):
+    if randint(0,total) <= part:
+        return True
+    return False
+
+def prob_double(prob):
+    if random() <= prob:
+        return True
+    return False
 
 class Node:
     """
@@ -14,12 +29,18 @@ class Node:
     generate a table for each day
     Each table contains an entity for each flight and a bool value representing wether to take it
     """
+    val = 0
     def __init__(self, startDate, endDate):
         self.startDate = startDate
         self.endDate = endDate
         self.tables = []
         for i in range(0,(self.endDate-self.startDate).days+1):
             self.tables.append(self.table(self.startDate+datetime.timedelta(days = i)))
+        self.val = self.eval()
+
+    def update(self):
+        self.val = self.eval()
+        return self.val
 
     def __lt__(self, other):
         if self.eval() < other.eval():
@@ -58,6 +79,16 @@ class Node:
         if not BFS.earlyTo(self.tables[-1].getFinalFlight().arrivalTime,self.endDate):
             result -= TIME_CONFLICT_WEIGHT
         return result
+
+    def hybridization(self,other):
+        crosspoint = randint(0,self.tables.__len__()-1)
+        for i in range(0,crosspoint):
+            (self.tables[i],other.tables[i]) = (other.tables[i],self.tables[i])
+        self.tables[crosspoint].hybridization(other.tables[crosspoint])
+
+    def mutation(self):
+        for t in self.tables:
+            t.mutation()
 
     class table:
 
@@ -112,6 +143,17 @@ class Node:
                 print(self.flightTable[a].flight.flightNO)
                 print(other.flightTable[a].flight.flightNO)
 
+        def hybridization(self,other):
+            crosspoint = randint(0,self.flightTable.__len__()-1)
+            for i in range(0,crosspoint):
+                (self.flightTable[i].taken,other.flightTable[i].taken) = (other.flightTable[i].taken,self.flightTable[i].taken)
+
+        def mutation(self):
+            for ele in self.flightTable:
+                if prob_double(MUTATION_PROB):
+                    ele.taken = not ele.taken
+
+
         class tableElement:
             flight = None
             taken = False
@@ -119,8 +161,50 @@ class Node:
                 self.flight = flight
                 self.taken = taken
 
-a = Node.table(datetime.datetime.now())
-print(a.eval())
 
-b = Node(datetime.datetime.now(),datetime.datetime.now()+datetime.timedelta(days = 5))
-print(b.eval())
+
+
+def GA(startDate, endDate, startCity, destination):
+    DEPARTURE_CITY = startCity
+    ARRIVAL_CITY = destination
+    horde = []
+    while horde.__len__() < HORDE_SIZE:
+        horde.append(Node(startDate,endDate))
+    for i in range(0,MAX_ITERATION_LIMIT):
+        print("process"+str(i)+"/"+str(MAX_ITERATION_LIMIT))
+        #selection
+        minval = EVALUATION_INITIAL_GUESS * (endDate-startDate).days
+        maxval = -EVALUATION_INITIAL_GUESS * (endDate-startDate).days
+        total = 0
+        for individual in horde:
+            if individual.val < minval:
+                minval = individual.val
+            if individual.val > maxval:
+                maxval = individual.val
+            total += individual.val
+
+        total -= HORDE_SIZE*minval
+        selectedhorde = []
+        while selectedhorde.__len__()<HORDE_SIZE:
+            for individual in horde:
+                if prob_int(individual.val-minval, total):
+                    selectedhorde.append(individual)
+                    break
+        #hybridization
+        for i in range(0,selectedhorde.__len__(),2):
+            selectedhorde[i].hybridization(selectedhorde[i+1])
+        #mutation
+        for individual in selectedhorde:
+            individual.mutation()
+            individual.update()
+        horde = selectedhorde
+    return horde
+
+def test():
+    startDate = datetime.datetime.now()
+    endDate = startDate + datetime.timedelta(days = 5)
+    startCity = "miyazaki"
+    destination = "okinawa"
+    print(GA(startDate,endDate,startCity,destination)[0].eval())
+
+test()
