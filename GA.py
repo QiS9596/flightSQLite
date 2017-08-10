@@ -3,6 +3,9 @@ import sql
 from random import randint
 import datetime
 
+TIME_CONFLICT_WEIGHT = 1000
+DESTINATION_CONFLICT_WEIGHT = 1000
+
 class Node:
     """
     Node class for Genetic Algorithm,
@@ -33,17 +36,38 @@ class Node:
                 flight = BFS.flight(f[2],f[3],f[5],f[4],f[1],f[0],currentDate)
                 self.flightTable.append(self.tableElement(flight,randint(0,1)))
         def eval(self):
-            pass
+            result = 0
+            self.earliestDate = datetime.datetime(year=self.currentDate.year, month= self.currentDate.month, day=self.currentDate.day,
+                                                  hour=0, minute=0, second=0)
+            self.earliestDate = self.earliestDate + datetime.timedelta(days = 1)
+            self.latestDate = datetime.datetime(year=self.currentDate.year,month= self.currentDate.month,day=self.currentDate.day,
+                                            hour=0,minute=0,second=0)
+
+            for i in range(0,self.flightTable.__len__()):
+                if self.flightTable[i].taken:
+                    result += self.flightTable[i].flight.Mileage
+                    if BFS.earlyTo(self.flightTable[i].flight.departureTime, self.earliestDate):
+                        self.earliestDate = self.flightTable[i].flight.departureTime
+                        self.earliestFlight = self.flightTable[i].flight
+                    if BFS.earlyTo(self.latestDate,self.flightTable[i].flight.arrivalTime):
+                        self.latestDate = self.flightTable[i].flight.arrivalTime
+                        self.latestFlight = self.flightTable[i].flight
+
+                    for ii in range(i,self.flightTable.__len__()):
+                        if self.flightTable[ii].taken:
+                            if BFS.earlyTo(self.flightTable[i].flight.arrivalTime,
+                                           self.flightTable[ii].flight.departureTime):
+                                result -= TIME_CONFLICT_WEIGHT
+                            if not self.flightTable[i].flight.destination == self.flightTable[ii].flight.departureCity:
+                                result -= DESTINATION_CONFLICT_WEIGHT
+            return result
+
         def getTableDate(self):
             return self.currentDate
-        def getStartCity(self):
-            pass
-        def getFinalCity(self):
-            pass
-        def getFirstDepatureTime(self):
-            pass
-        def getLastDepatureTime(self):
-            pass
+        def getFirstFlight(self):
+            return self.earliestFlight
+        def getFinalFlight(self):
+            return self.latestFlight
         def test(self):
             for f in self.flightTable:
                 print(f.flight.flightNO)
@@ -60,3 +84,5 @@ class Node:
                 self.flight = flight
                 self.taken = taken
 
+a = Node.table(datetime.datetime.now())
+print(a.eval())
