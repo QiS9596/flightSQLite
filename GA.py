@@ -21,6 +21,18 @@ class Node:
         for i in range(0,(self.endDate-self.startDate).days+1):
             self.tables.append(self.table(self.startDate+datetime.timedelta(days = i)))
 
+    def __lt__(self, other):
+        if self.eval() < other.eval():
+            return True
+        return False
+    def __eq__(self, other):
+        if self.eval() == other.eval()\
+           and self.startDate == other.startDate\
+           and self.endDate == other.endDate:
+            return True
+        return False
+
+
     def printInfo(self):
         for a in self.tables:
             print(a.getTableDate())
