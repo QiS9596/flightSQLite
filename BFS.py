@@ -120,7 +120,10 @@ def BFS(StartCity,EndCity):
     current = pq.get_nowait()[1]
     last = current.eval()
     resultflag = True
-    for flight in current.currentairport.getDepartureFlight(current.currentDatetime):
+    todayAndTomorrow = current.currentairport.getDepartureFlight(current.currentDatetime)
+    
+    todayAndTomorrow+=(current.currentairport.getDepartureFlight(current.currentDatetime))
+    for flight in todayAndTomorrow:
       if earlyTo(current.currentDatetime,flight.departureTime):
         newNode = node(history=current,flight=flight)
         if newNode.eval() > last: #if some value of the desendents of current node is greater than current, it won't be a maximum
