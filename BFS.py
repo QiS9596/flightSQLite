@@ -7,7 +7,7 @@ TIME_END_FLAG = 10000 #some big constant used in eval()
 DESTINATION_FLAG = 10000  #some big constant
 MAXIMUM_CYCLE_LIMIT = 10000 #a big constant used to limit the iteration loop number
 destination = None  #global variable holds the destination
-flightDBManager = sql.FlightDBManager()
+flightDBManager = sql.FlightTestingDBManager()
 
 def earlyTo(datetime1,datetime2):
     sec = (datetime1-datetime2).total_seconds()
@@ -121,7 +121,7 @@ def BFS(StartCity,EndCity):
     last = current.eval()
     resultflag = True
     todayAndTomorrow = current.currentairport.getDepartureFlight(current.currentDatetime)
-    
+
     todayAndTomorrow+=(current.currentairport.getDepartureFlight(current.currentDatetime))
     for flight in todayAndTomorrow:
       if earlyTo(current.currentDatetime,flight.departureTime):
@@ -139,9 +139,23 @@ def BFS(StartCity,EndCity):
 
 start_city = city("miyazaki")
 end_city = city("okinawa")
-startDatetime = datetime.datetime.now()
-endDatetime = startDatetime + datetime.timedelta(days=2)
-history = BFS(start_city,end_city).flightHistory
+#startDatetime = datetime.datetime.now()
+#endDatetime = startDatetime + datetime.timedelta(days=20)
+
+
+def search(start_city,end_city,startdate,enddate):
+    start_city = city(start_city)
+    end_city = city(end_city)
+    global startDatetime,endDatetime
+    startDatetime = startdate
+    endDatetime = enddate
+    history = BFS(start_city,end_city).flightHistory
+    return history
+
+def check(history, start_city, end_city, startdate, enddate):
+    pass
+
+history = search("miyazaki","okinawa",datetime.datetime.now(),datetime.datetime.now() + datetime.timedelta(days=20))
 for ticket in history:
     print(ticket.departureTime)
     print(ticket.arrivalTime)

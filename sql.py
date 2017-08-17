@@ -70,7 +70,7 @@ class MileageDBManager:
             self.insertNewCity(lower)
 
 
-class FlightDBManager:
+class FlightTestingDBManager:
     """
     Use to maintain a temporary sqlite database table for flighte,
     capable for generating random flight for algorithm tests
@@ -78,6 +78,12 @@ class FlightDBManager:
     conn = None
     def __init__(self):
         self.conn = sqlite3.connect("text.db")
+
+    def getCityNameList(self):
+        citylist = self.conn.execute("""
+            SELECT CITYNAME FROM CITY
+        """)
+        return citylist
 
     def insertNewFlight(self,depatureCity, arrivalCity, depatureTime, arrivalTime, mileage, FlightNO):
         if self.flightInDatabase(FlightNO):
