@@ -1,7 +1,7 @@
 import sqlite3
 import random
 import datetime
-
+print("abc")
 class MileageDBManager:
     """
     Database Manager for maintaining a sqlite database table for Mileage infomation

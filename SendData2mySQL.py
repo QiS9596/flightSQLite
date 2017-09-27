@@ -1,5 +1,6 @@
 import pymysql
 import sys
+
 dbName = 'FlightMySql'
 usrname = 'admin'
 authentication_string = 'admin'
@@ -64,5 +65,44 @@ def addData(*args):
     db.commit()
     db.close()
 
-#class mySQLManager:
-#    def __init__(self):
+uploadAirline('05001', 'LOS', 'TPE', '18:00', '19:00', '30')
+
+db = pymysql.connect('localhost', usrname, authentication_string, dbName)
+cursor = db.cursor()
+class mySQLManager:
+    def __init__(self):
+        pass
+
+    def getCityNameList(self):
+        """
+        get the entire list of cities or airports
+        :return: a list or tuple
+        """
+        pass
+
+    def insertNewFlight(self,depatureCity, arrivalCity, depatureTime, arrivalTime, mileage, FlightNO):
+        sql = 'INSERT INTO airline(ID, DepartureAirport, ArriveAirport, DepartureTime, ArriveTime, kilos) VALUES(\'%s\',\'%s\',\'%s\',\'%s\',\'%s\',\'%s\')'%(FlightNO,depatureCity,arrivalCity,depatureTime,arrivalTime,mileage)
+        cursor.execute(sql)
+        db.commit()
+
+    def getAvaliableFlightList(self, depature_city_name):
+        """
+        get a list of flight that departure from the current city with the name
+        :param depature_city_name: the name of the current city
+        :return: a list or tuple of flight
+        """
+        city = depature_city_name.lower()
+        sql = 'SELECT * FROM FLIGHT WHERE DEPATURECITY = \'%s\''%(city)
+        cursor.execute(sql)
+        query_result = cursor.fetchall()
+        result = []
+        for flight in query_result:
+            result.append([query_result[1],query_result[2],query_result[3],query_result[4],query_result[5],query_result[0]])
+        return result
+
+    def flightInDatabase(self, FlightNO):
+        """
+        check if the current flight is in the flight
+        :param FlightNO:
+        :return:
+        """
