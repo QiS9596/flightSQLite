@@ -15,7 +15,9 @@ for city in cities:
     temp = city.findAll("tr")
     for a in temp:
         data = list(a.findAll("td"))
-        if data.__len__() == 4:
-            DBM.insertNewConnectData(city["id"],data[0].text,int(re.sub(",","",data[1].text),10),int(data[2].text,10),int(data[3].text,10))
+        if not data.__len__() == 0:
+            fullMileage = int(re.sub(",","",data[1].text),10)
+            threequaterMileage = int(0.75*fullMileage)
+            halfMileage = int(0.5*fullMileage)
+            DBM.insertNewConnectData(city["id"],data[0].text.lower(),fullMileage,threequaterMileage,halfMileage)
 
-print(DBM.isInCityList("abc"))
