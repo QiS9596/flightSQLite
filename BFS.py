@@ -137,8 +137,8 @@ def BFS(StartCity,EndCity):
     pq.put_nowait((-a.eval(),a))
   return pq.get_nowait()[1]
 
-start_city = city("miyazaki")
-end_city = city("okinawa")
+#start_city = city("miyazaki")
+#end_city = city("okinawa")
 #startDatetime = datetime.datetime.now()
 #endDatetime = startDatetime + datetime.timedelta(days=20)
 
