@@ -3,6 +3,7 @@ This modula provides generals utilities to the project
 """
 
 import random
+import datetime
 
 def select_on_prob(item_list, prob_list):
     """
@@ -20,7 +21,19 @@ def select_on_prob(item_list, prob_list):
         total += num
     flag = random.uniform(0,total)
     cumulative_probability = 0.0
-    for item,prob in (item_list,prob_list):
-        cumulative_probability += prob_list
+    for i in range(0,len(item_list)):
+        cumulative_probability += prob_list[i]
         if flag < cumulative_probability:
-            return item
+            return item_list[i]
+
+def getTomorrowDatetime(current):
+    """
+    returns the datetime object of the next day 0hrs,0min,0sec of the current datetime instance
+    :param current: a current datetime
+    :return: datetime object
+    """
+    year = current.year
+    month = current.month
+    day = current.day
+    dateStr = "%d:%d:%d %d-%d-%d"%(year,month,day,0,0,0)
+    return datetime.datetime.strptime(dateStr,"%Y:%m:%d %H-%M-%S") + datetime.timedelta(days=1)
