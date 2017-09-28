@@ -155,8 +155,8 @@ def search(start_city,end_city,startdate,enddate):
 def check(history, start_city, end_city, startdate, enddate):
     pass
 
-history = search("miyazaki","okinawa",datetime.datetime.now(),datetime.datetime.now() + datetime.timedelta(days=20))
-for ticket in history:
-    print(ticket.departureTime)
-    print(ticket.arrivalTime)
-    print(ticket.flightNO)
+# history = search("miyazaki","okinawa",datetime.datetime.now(),datetime.datetime.now() + datetime.timedelta(days=20))
+# for ticket in history:
+#     print(ticket.departureTime)
+#     print(ticket.arrivalTime)
+#     print(ticket.flightNO)
