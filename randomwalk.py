@@ -28,7 +28,7 @@ class randomwalk:
         self.flightDBManager = flightDBManager
         self.startDatetime = startDatetime
         self.currentDatetime = startDatetime
-        self.endDatetime = startDatetime
+        self.endDatetime = endDatetime
         self.start_city = start_city
         self.groupe_size = group_size
 
