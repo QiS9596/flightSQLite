@@ -145,6 +145,12 @@ class FlightTestingDBManager:
             self.insertNewFlight(depature_city,arrival_city,depature_time,arrival_time,mileage,FlightNO)
             self.insertNewFlight(depature_city,arrival_city,depature_time,arrival_time,mileage,FlightNO)
 
+    def getEnireFlightList(self):
+        result = self.conn.execute("""
+            SELECT * FROM FLIGHT
+        """)
+        return result
+
 class DateStringGenerator:
     @staticmethod
     def numToDateStr(hour,min):
@@ -174,3 +180,10 @@ class DateStringGenerator:
     def toDateObject(time,year,month,day):
         date_str = str(year)+"-"+str(month)+"-"+str(day)+" "+time
         return datetime.datetime.strptime(date_str,"%Y-%m-%d %H:%M")
+
+def transferDataFromSQLLitetoMySQL():
+    SQLDBM = FlightTestingDBManager()
+    import SendData2mySQL
+    mySQLDBM = SendData2mySQL.mySQLManager()
+    for f in SQLDBM.getEnireFlightList():
+        mySQLDBM.insertNewFlight(depatureCity=f[0],arrivalCity=f[1],depatureTime=f[2],arrivalTime=f[3],mileage=f[4],FlightNO=f[5])

@@ -65,7 +65,7 @@ def addData(*args):
     db.commit()
     db.close()
 
-uploadAirline('05001', 'LOS', 'TPE', '18:00', '19:00', '30')
+#uploadAirline('05001', 'LOS', 'TPE', '18:00', '19:00', '30')
 
 db = pymysql.connect('localhost', usrname, authentication_string, dbName)
 cursor = db.cursor()
@@ -92,12 +92,12 @@ class mySQLManager:
         :return: a list or tuple of flight
         """
         city = depature_city_name.lower()
-        sql = 'SELECT * FROM FLIGHT WHERE DEPATURECITY = \'%s\''%(city)
+        sql = 'SELECT * FROM airline WHERE DepartureAirport = \'%s\''%(city)
         cursor.execute(sql)
         query_result = cursor.fetchall()
         result = []
         for flight in query_result:
-            result.append([query_result[1],query_result[2],query_result[3],query_result[4],query_result[5],query_result[0]])
+            result.append([flight[1],flight[2],flight[3],flight[4],flight[5],flight[0]])
         return result
 
     def flightInDatabase(self, FlightNO):
@@ -106,7 +106,7 @@ class mySQLManager:
         :param FlightNO:the flight number of the flight we want to check
         :return: True is that flight is in the database, False if not
         """
-        sql = 'SELECT * FROM FLIGHT'
+        sql = 'SELECT * FROM airline'
         cursor.execute(sql)
         query_result = cursor.fetchall()
         for flight in query_result:
