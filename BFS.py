@@ -123,7 +123,7 @@ def BFS(StartCity,EndCity):
     current = pq.get_nowait()[1]
     if current.currentairport.city_name == destination.city_name  :
         #pq.put_nowait((-current.eval(),current))
-        if (endDatetime - current.currentDatetime).days < 1:
+        if 0<= (endDatetime - current.currentDatetime).days < 1:
             return current
     last = current.eval()
     resultflag = True
