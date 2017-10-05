@@ -103,6 +103,13 @@ class mySQLManager:
     def flightInDatabase(self, FlightNO):
         """
         check if the current flight is in the flight
-        :param FlightNO:
-        :return:
+        :param FlightNO:the flight number of the flight we want to check
+        :return: True is that flight is in the database, False if not
         """
+        sql = 'SELECT * FROM FLIGHT'
+        cursor.execute(sql)
+        query_result = cursor.fetchall()
+        for flight in query_result:
+            if flight[0] == FlightNO:
+                return True
+        return False
