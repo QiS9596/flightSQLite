@@ -69,7 +69,7 @@ def addData(*args):
 
 db = pymysql.connect('localhost', usrname, authentication_string, dbName)
 cursor = db.cursor()
-class mySQLManager:
+class mySQLFlightManager:
     def __init__(self):
         pass
 
@@ -113,3 +113,14 @@ class mySQLManager:
             if flight[0] == FlightNO:
                 return True
         return False
+
+
+class City_Airport_mySQLManager:
+    table_name = 'CITY_AIRPORT'
+    def insert_new_pair(self,city_name, ICAO, IATA):
+        sql = 'INSERT INTO CITY_AIRPORT(CITY_NAME,ICAO,IATA) VALUES (\'%s\',\'%s\',\'%s\')'%(city_name,ICAO,IATA)
+        cursor.execute(sql)
+        db.commit()
+
+    def check_existence(self,city_name,ICAL,IATA):
+        pass

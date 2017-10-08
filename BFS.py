@@ -2,14 +2,14 @@ from asyncio import PriorityQueue
 import datetime
 import sql
 import util
-from SendData2mySQL import mySQLManager
+from SendData2mySQL import mySQLFlightManager
 startDatetime = None  #the start date time set by user
 endDatetime = None   #the arrival deadline set by user
 TIME_END_FLAG = 10000 #some big constant used in eval()
 DESTINATION_FLAG = 100000  #some big constant
 MAXIMUM_CYCLE_LIMIT = 10000 #a big constant used to limit the iteration loop number
 destination = None  #global variable holds the destination
-flightDBManager = mySQLManager()
+flightDBManager = mySQLFlightManager()
     #sql.FlightTestingDBManager()
 
 def earlyTo(datetime1,datetime2):

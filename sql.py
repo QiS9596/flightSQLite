@@ -184,6 +184,6 @@ class DateStringGenerator:
 def transferDataFromSQLLitetoMySQL():
     SQLDBM = FlightTestingDBManager()
     import SendData2mySQL
-    mySQLDBM = SendData2mySQL.mySQLManager()
+    mySQLDBM = SendData2mySQL.mySQLFlightManager()
     for f in SQLDBM.getEnireFlightList():
         mySQLDBM.insertNewFlight(depatureCity=f[0],arrivalCity=f[1],depatureTime=f[2],arrivalTime=f[3],mileage=f[4],FlightNO=f[5])
