@@ -118,9 +118,12 @@ class mySQLFlightManager:
 class City_Airport_mySQLManager:
     table_name = 'CITY_AIRPORT'
     def insert_new_pair(self,city_name, ICAO, IATA):
-        sql = 'INSERT INTO CITY_AIRPORT(CITY_NAME,ICAO,IATA) VALUES (\'%s\',\'%s\',\'%s\')'%(city_name,ICAO,IATA)
-        cursor.execute(sql)
-        db.commit()
+        try:
+            sql = 'INSERT INTO CITY_AIRPORT(CITY_NAME,ICAO,IATA) VALUES (\'%s\',\'%s\',\'%s\')'%(city_name,ICAO,IATA)
+            cursor.execute(sql)
+            db.commit()
+        except UnicodeError as UE:
+            print(str(type(UE)) + UE.__str__())
 
     def check_existence(self,city_name,ICAL,IATA):
         pass
