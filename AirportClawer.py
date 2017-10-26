@@ -6,13 +6,14 @@ import SendData2mySQL
 class myException(Exception):
     pass
 
+
 dbm = SendData2mySQL.City_Airport_mySQLManager()
 gcontext = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
 html = urlopen('https://en.wikipedia.org/wiki/List_of_airports_in_Japan',context=gcontext)
 bs = BeautifulSoup(html, 'lxml')
 #table is the table that contains the data
 table = bs.find("table",{"class":"wikitable sortable"})
-strange_list = ['Asahikawa, Hokkaidō','Tokyo','Chitose, Hokkaidō','Hakodate, Hokkaidō','Kushiro, Hokkaidō','Obihiro, Hokkaidō']
+#strange_list = ['Asahikawa, Hokkaidō','Tokyo','Chitose, Hokkaidō','Hakodate, Hokkaidō','Kushiro, Hokkaidō','Obihiro, Hokkaidō']
 for row in table.find_all('tr'):
     data = []
     """

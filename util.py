@@ -37,3 +37,11 @@ def getTomorrowDatetime(current):
     day = current.day
     dateStr = "%d:%d:%d %d-%d-%d"%(year,month,day,0,0,0)
     return datetime.datetime.strptime(dateStr,"%Y:%m:%d %H-%M-%S") + datetime.timedelta(days=1)
+
+
+import unicodedata
+def strip_accents(s):
+   return ''.join(c for c in unicodedata.normalize('NFD', s)
+                  if unicodedata.category(c) != 'Mn')
+
+
