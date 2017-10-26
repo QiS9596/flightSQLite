@@ -3,7 +3,9 @@ from urllib.request import urlopen
 import ssl
 import sql
 import re
-
+"""
+*"Tokyo" is used to indicate both Haneda and Narita airports while "Osaka" is used to indicate Itami, Kansai, and Kobe airports.
+"""
 gcontext = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
 html = urlopen("https://www.ana.co.jp/wws/us/e/asw_common/amc/reference/tameru/flightmile/dom/chart.html",context=gcontext)
 bs = BeautifulSoup(html,"lxml")
@@ -19,5 +21,6 @@ for city in cities:
             fullMileage = int(re.sub(",","",data[1].text),10)
             threequaterMileage = int(0.75*fullMileage)
             halfMileage = int(0.5*fullMileage)
+
             DBM.insertNewConnectData(city["id"],data[0].text.lower(),fullMileage,threequaterMileage,halfMileage)
 
