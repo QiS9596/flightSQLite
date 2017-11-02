@@ -7,7 +7,8 @@ startDatetime = None  #the start date time set by user
 endDatetime = None   #the arrival deadline set by user
 TIME_END_FLAG = 10000 #some big constant used in eval()
 DESTINATION_FLAG = 100000  #some big constant
-MAXIMUM_CYCLE_LIMIT = 10000 #a big constant used to limit the iteration loop number
+MAXIMUM_CYCLE_LIMIT = 3000 #a big constant used to limit the iteration loop number
+COMPROMISED_CASE_NUMBER = 10 #the number of local maximum value we look for
 destination = None  #global variable holds the destination
 flightDBManager = mySQLFlightManager()
     #sql.FlightTestingDBManager()
@@ -124,36 +125,36 @@ def BFS(StartCity,EndCity):
     #and explore every avaliable flight
     current = pq.get_nowait()[1]
     if current.currentairport.city_name == destination.city_name  :
-        #pq.put_nowait((-current.eval(),current))
         if 0<= (endDatetime - current.currentDatetime).days < 1:
-            return current
+            result.append(current)
     last = current.eval()
-    resultflag = True
     todayAndTomorrow = current.currentairport.getDepartureFlight(current.currentDatetime)
     tomorrow = util.getTomorrowDatetime(current.currentDatetime)
     todayAndTomorrow+=(current.currentairport.getDepartureFlight(tomorrow))
+    #todayAndTomorrow is the list of flight that take off from current airport from now to the end of the next day
     for flight in todayAndTomorrow:
       if earlyTo(current.currentDatetime,flight.departureTime):
         newNode = node(history=current,flight=flight)
-        if newNode.eval() > last: #if some value of the desendents of current node is greater than current, it won't be a maximum
-          resultflag = False
         a = -newNode.eval()
         pq.put_nowait((a, newNode))
-    if resultflag:#otherwise it's a local maximum or global maximum
-      result.append(current)
+    if len(result)>=COMPROMISED_CASE_NUMBER:
+        break
     count += 1
 
   for a in result:#get all of these maximum value together and return the one with maximum value
     pq.put_nowait((-a.eval(),a))
   return pq.get_nowait()[1]
 
-#start_city = city("miyazaki")
-#end_city = city("okinawa")
-#startDatetime = datetime.datetime.now()
-#endDatetime = startDatetime + datetime.timedelta(days=20)
-
 
 def search(start_city,end_city,startdate,enddate):
+    """
+    search method, using Best First Search
+    :param start_city: the city name of the departure city
+    :param end_city: the city name of the destination
+    :param startdate: the start datetime, should be datetime.datetime object
+    :param enddate: the deadline datetime, shoudl be datetime.datetime object
+    :return: a list of BFS.Flight object
+    """
     start_city = city(start_city)
     end_city = city(end_city)
     global startDatetime,endDatetime
@@ -162,11 +163,3 @@ def search(start_city,end_city,startdate,enddate):
     history = BFS(start_city,end_city).flightHistory
     return history
 
-def check(history, start_city, end_city, startdate, enddate):
-    pass
-
-# history = search("miyazaki","okinawa",datetime.datetime.now(),datetime.datetime.now() + datetime.timedelta(days=20))
-# for ticket in history:
-#     print(ticket.departureTime)
-#     print(ticket.arrivalTime)
-#     print(ticket.flightNO)
