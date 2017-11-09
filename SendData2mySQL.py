@@ -1,9 +1,11 @@
 import pymysql
 import sys
+import util
 
-dbName = 'FlightMySql'
-usrname = 'admin'
-authentication_string = 'admin'
+dbName = util.DEFAULT_REMOTE_DATABASE.database_name
+usrname = util.DEFAULT_REMOTE_DATABASE.user_name
+authentication_string = util.DEFAULT_REMOTE_DATABASE.authentication_string
+
 def uploadAirline(*args):
     """
     pymysql is required to be imported
@@ -67,7 +69,7 @@ def addData(*args):
 
 #uploadAirline('05001', 'LOS', 'TPE', '18:00', '19:00', '30')
 
-db = pymysql.connect('localhost', usrname, authentication_string, dbName)
+db = pymysql.connect(util.DEFAULT_REMOTE_DATABASE.host, usrname, authentication_string, dbName)
 cursor = db.cursor()
 class mySQLFlightManager:
     def __init__(self):
@@ -113,6 +115,14 @@ class mySQLFlightManager:
             if flight[0] == FlightNO:
                 return True
         return False
+
+    def updateInfo(self,ID, kilos):
+        sql = """UPDATE airline
+                 SET kilos = %d
+                 WHERE ID = %s
+                 """%(kilos,ID)
+        cursor.execute(sql)
+        db.commit()
 
 
 class City_Airport_mySQLManager:

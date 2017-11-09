@@ -1,5 +1,6 @@
 import sqlite3
 import random
+import util
 import datetime
 class MileageDBManager:
     """
@@ -44,6 +45,15 @@ class MileageDBManager:
             if (FullMileage == a[2]) and ((cityName1 in a[0] and cityName2 in a[1]) or (cityName1 in a[1] and cityName2 in a[0])):
                 return True
         return False
+
+    def getMileage(self,cityName1, cityName2):
+        lst = self.conn.execute("""
+          SELECT CITY1, CITY2, MILEAGEFULL FROM CONNECT
+        """)
+        for a in lst:
+            if cityName1 in a and cityName2 in a:
+                return a[2]
+        raise util.NullResultException()
 
     def refactorConnList(self):
         connectList = self.conn.execute("""
@@ -97,10 +107,3 @@ class DateStringGenerator:
     def toDateObject(time,year,month,day):
         date_str = str(year)+"-"+str(month)+"-"+str(day)+" "+time
         return datetime.datetime.strptime(date_str,"%Y-%m-%d %H:%M")
-
-def transferDataFromSQLLitetoMySQL():
-    SQLDBM = FlightTestingDBManager()
-    import SendData2mySQL
-    mySQLDBM = SendData2mySQL.mySQLFlightManager()
-    for f in SQLDBM.getEnireFlightList():
-        mySQLDBM.insertNewFlight(depatureCity=f[0],arrivalCity=f[1],depatureTime=f[2],arrivalTime=f[3],mileage=f[4],FlightNO=f[5])
