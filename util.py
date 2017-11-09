@@ -44,4 +44,18 @@ def strip_accents(s):
    return ''.join(c for c in unicodedata.normalize('NFD', s)
                   if unicodedata.category(c) != 'Mn')
 
+class databaseinfo:
+    def __init__(self, host, user_name, authentication_string, database_name):
+        self.host = host
+        self.user_name = user_name
+        self.authentication_string = authentication_string
+        self.database_name = database_name
 
+DEFAULT_REMOTE_DATABASE = databaseinfo(host='anaflight.ddns.net',user_name='admin4',authentication_string='admin4',database_name='test')
+
+class ANAFlightException(Exception):
+    pass
+class NullResultException(ANAFlightException):
+    pass
+class JumpingException(ANAFlightException):
+    pass
