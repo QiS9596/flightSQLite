@@ -68,8 +68,8 @@ def addData(*args):
     db.close()
 
 #uploadAirline('05001', 'LOS', 'TPE', '18:00', '19:00', '30')
-
-db = pymysql.connect(util.DEFAULT_REMOTE_DATABASE.host, usrname, authentication_string, dbName)
+from MileageCheck import dbinit
+db = dbinit()
 cursor = db.cursor()
 class mySQLFlightManager:
     def __init__(self):
@@ -117,10 +117,8 @@ class mySQLFlightManager:
         return False
 
     def updateInfo(self,ID, kilos):
-        sql = """UPDATE airline
-                 SET kilos = %d
-                 WHERE ID = %s
-                 """%(kilos,ID)
+        sql = """UPDATE airline SET kilos = %s WHERE ID = \'%s\'"""%(str(kilos),ID)
+        print(sql)
         cursor.execute(sql)
         db.commit()
 

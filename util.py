@@ -57,5 +57,7 @@ class ANAFlightException(Exception):
     pass
 class NullResultException(ANAFlightException):
     pass
+class QueryException(ANAFlightException):
+    pass
 class JumpingException(ANAFlightException):
     pass
