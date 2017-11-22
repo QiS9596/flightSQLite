@@ -54,6 +54,10 @@ class databaseinfo:
 DEFAULT_REMOTE_DATABASE = databaseinfo(host='anaflight.ddns.net',user_name='admin4',authentication_string='admin4',database_name='test')
 
 class ANAFlightException(Exception):
+    logfile = 'ANAFlightExceptionLog.txt'
+    def log(self):
+        with open(self.logfile,'wt') as file:
+            file.write(str(self.__class__) + str(self.args))
     pass
 class NullResultException(ANAFlightException):
     pass
