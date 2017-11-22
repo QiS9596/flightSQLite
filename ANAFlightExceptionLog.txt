@@ -1,0 +1,1 @@
+<class 'util.QueryException'>('UKB not recorded in the online mileage calculator',)

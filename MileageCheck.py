@@ -31,17 +31,12 @@ def getMatchedCity(db,IATA):
     cursor.execute(sqlCommand)
     a = cursor.fetchall()
     if a == 0:
-        raise util.NullResultException
+        raise util.NullResultException("MileageCheck.getMatchedCity: no matched city for airport: "+IATA)
     return a
 
 def getOnlineMileage(IATA1,IATA2):
     url = """http://www.webflyer.com/travel/mileage_calculator/getmileage.php?city=%s&city=%s&city = & city = & city = & city = & bonus = 0 & bonus_use_min = 0 & class_bonus = 0 & class_bonus_use_min = 0 & promo_bonus = 0 & promo_bonus_use_min = 0 & min = 0 & min_type = m & ticket_price = """%(IATA1,IATA2)
     gcontext = ssl._SSLContext(ssl.PROTOCOL_SSLv23)
-    #driver = webdriver.PhantomJS(executable_path='/usr/local/bin/PhantomJS')
-    #driver.get(url)
-    #from time import sleep
-    #sleep(5)
-    #print(driver.page_source)
     html = urlopen(url,context=gcontext)
     bs = BeautifulSoup(html,'lxml')
 
@@ -58,10 +53,11 @@ def getOnlineMileage(IATA1,IATA2):
         for data in datas:
             texts.append(data.text)
         if 'Distance' in texts:
+            print(texts)
             for text in texts:
-                if re.match('[1-9]+ miles',text):
-                    numric = re.sub('( )*miles','',text)
-                    result.append(int(numric))
+                if re.match('[0-9\.]+ miles',text):
+                    numric = re.sub('miles','',text)
+                    result.append(float(numric))
     mileage = 'NULL'
     try:
         mileage = min(result)

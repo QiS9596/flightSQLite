@@ -53,11 +53,19 @@ class databaseinfo:
 
 DEFAULT_REMOTE_DATABASE = databaseinfo(host='anaflight.ddns.net',user_name='admin4',authentication_string='admin4',database_name='test')
 
+class logutil:
+    def __init__(self, logfileName):
+        self.logfileName = logfileName
+    def log(self,str,header = 'RoloSong'):
+        header = '['+header+']'
+        with open(self.logfileName,'a') as file:
+            file.write(header+str)
+
 class ANAFlightException(Exception):
     logfile = 'ANAFlightExceptionLog.txt'
+    logAgent = logutil(logfile)
     def log(self):
-        with open(self.logfile,'wt') as file:
-            file.write(str(self.__class__) + str(self.args))
+        self.logAgent.log(self(self.args),self.__class__)
     pass
 class NullResultException(ANAFlightException):
     pass
@@ -65,3 +73,4 @@ class QueryException(ANAFlightException):
     pass
 class JumpingException(ANAFlightException):
     pass
+
