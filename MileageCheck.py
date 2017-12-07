@@ -1,4 +1,7 @@
 import pymysql
+
+import SendData2mySQL
+import sql
 import util
 import ssl
 from bs4 import BeautifulSoup
@@ -64,3 +67,32 @@ def getOnlineMileage(IATA1,IATA2):
     except ValueError:
         print(IATA1+' '+IATA2)
     return mileage
+
+
+def fillMileageChart():
+    db = dbinit()
+    dbm = SendData2mySQL.mySQLFlightManager()
+    result = getAllIllegalData(db)
+    anaflightdb = sql.MileageDBManager()
+    i = 0
+    j = len(result)
+    for data in result:
+        i+=1
+        global mileage
+        mileage = 'NULL'
+        #print(data)
+        print(str(i)+'/'+str(j))
+        try:
+            try:
+                city1 = getMatchedCity(db, data[1])[0][1].lower()
+                city2 = getMatchedCity(db, data[2])[0][1].lower()
+                mileage = int(anaflightdb.getMileage(city1,city2))
+            except util.NullResultException:
+                mileage = getOnlineMileage(data[1],data[2])
+            dbm.updateInfo(data[0],mileage)
+        except util.QueryException as qe:
+            qe.log()
+        except IndexError:
+            util.ANAFlightException("Unknow Exception occured for city "+ str(data))
+        except Exception as E:
+            print(E)
