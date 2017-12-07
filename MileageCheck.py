@@ -1,11 +1,12 @@
 import pymysql
-
+from queue import Queue
 import SendData2mySQL
 import sql
 import util
 import ssl
 from bs4 import BeautifulSoup
 from urllib.request import urlopen
+import threading
 import re
 def dbinit(databaseinfo=util.DEFAULT_REMOTE_DATABASE):
     db = pymysql.connect(databaseinfo.host,
@@ -68,12 +69,24 @@ def getOnlineMileage(IATA1,IATA2):
         print(IATA1+' '+IATA2)
     return mileage
 
+communicationQueue = Queue()
+_sentinel = object()
+
+def databaseManagerThreadFunc():
+    dbm = SendData2mySQL
+    while True:
+        if not communicationQueue.empty():
+            obj = communicationQueue.get()
+            if obj == _sentinel:
+                return
+            dbm.updateData(obj[0],obj[1])
 
 def fillMileageChart():
     db = dbinit()
-    dbm = SendData2mySQL.mySQLFlightManager()
     result = getAllIllegalData(db)
     anaflightdb = sql.MileageDBManager()
+    th = threading.Thread(target=databaseManagerThreadFunc)
+    th.start()
     i = 0
     j = len(result)
     for data in result:
@@ -89,10 +102,12 @@ def fillMileageChart():
                 mileage = int(anaflightdb.getMileage(city1,city2))
             except util.NullResultException:
                 mileage = getOnlineMileage(data[1],data[2])
-            dbm.updateInfo(data[0],mileage)
+            Queue.put([data[0],mileage])
         except util.QueryException as qe:
             qe.log()
         except IndexError:
             util.ANAFlightException("Unknow Exception occured for city "+ str(data))
         except Exception as E:
             print(E)
+
+    communicationQueue.put(_sentinel)
