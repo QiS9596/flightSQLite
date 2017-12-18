@@ -8,12 +8,7 @@ from bs4 import BeautifulSoup
 from urllib.request import urlopen
 import threading
 import re
-def dbinit(databaseinfo=util.DEFAULT_REMOTE_DATABASE):
-    db = pymysql.connect(databaseinfo.host,
-                         databaseinfo.user_name,
-                         databaseinfo.authentication_string,
-                         databaseinfo.database_name)
-    return db
+
 
 def getAllIllegalData(db):
     cursor = db.cursor()
@@ -82,7 +77,7 @@ def databaseManagerThreadFunc():
             dbm.updateData(obj[0],obj[1])
 
 def fillMileageChart():
-    db = dbinit()
+    db = util.dbinit()
     result = getAllIllegalData(db)
     anaflightdb = sql.MileageDBManager()
     th = threading.Thread(target=databaseManagerThreadFunc)

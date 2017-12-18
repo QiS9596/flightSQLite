@@ -68,8 +68,7 @@ def addData(*args):
     db.close()
 
 #uploadAirline('05001', 'LOS', 'TPE', '18:00', '19:00', '30')
-from MileageCheck import dbinit
-db = dbinit()
+db = util.dbinit()
 cursor = db.cursor()
 class mySQLFlightManager:
     def __init__(self):

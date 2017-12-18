@@ -4,6 +4,7 @@ This modula provides generals utilities to the project
 
 import random
 import datetime
+import pymysql
 
 def select_on_prob(item_list, prob_list):
     """
@@ -51,7 +52,7 @@ class databaseinfo:
         self.authentication_string = authentication_string
         self.database_name = database_name
 
-DEFAULT_REMOTE_DATABASE = databaseinfo(host='anaflight.ddns.net',user_name='admin4',authentication_string='admin4',database_name='test')
+DEFAULT_REMOTE_DATABASE = databaseinfo(host='124.218.32.37',user_name='admin4',authentication_string='admin4',database_name='test')
 
 class logutil:
     def __init__(self, logfileName):
@@ -74,3 +75,9 @@ class QueryException(ANAFlightException):
 class JumpingException(ANAFlightException):
     pass
 
+def dbinit(databaseinfo=DEFAULT_REMOTE_DATABASE):
+    db = pymysql.connect(databaseinfo.host,
+                         databaseinfo.user_name,
+                         databaseinfo.authentication_string,
+                         databaseinfo.database_name)
+    return db
