@@ -13,7 +13,7 @@ import re
 def getAllIllegalData(db):
     cursor = db.cursor()
     sqlCommand = """SELECT * FROM airline
-                    WHERE kilos = 0"""
+                    WHERE kilos = 0 or kilos = -1 or kilos = \'KILOS\'"""
     cursor.execute(sqlCommand)
     return cursor.fetchall()
 
@@ -29,7 +29,7 @@ def getMatchedCity(db,IATA):
                     WHERE IATA = \'%s\'"""%IATA
     cursor.execute(sqlCommand)
     a = cursor.fetchall()
-    if a == 0:
+    if a == 0 or len(a) == 0:
         raise util.NullResultException("MileageCheck.getMatchedCity: no matched city for airport: "+IATA)
     return a
 
@@ -62,19 +62,24 @@ def getOnlineMileage(IATA1,IATA2):
         mileage = min(result)
     except ValueError:
         print(IATA1+' '+IATA2)
+    except TypeError as TE:
+        print (TE)
+        print(IATA1+ ' ' + IATA2)
     return mileage
 
 communicationQueue = Queue()
 _sentinel = object()
 
 def databaseManagerThreadFunc():
-    dbm = SendData2mySQL
+    dbm = SendData2mySQL.mySQLFlightManager()
+    print("database Manager Thread initiated")
     while True:
-        if not communicationQueue.empty():
+        if not communicationQueue.qsize()==0:
+            print('communication queue not null, current size is '+ str(communicationQueue.qsize()))
             obj = communicationQueue.get()
             if obj == _sentinel:
                 return
-            dbm.updateData(obj[0],obj[1])
+            dbm.updateInfo(obj[0],obj[1])
 
 def fillMileageChart():
     db = util.dbinit()
@@ -97,12 +102,17 @@ def fillMileageChart():
                 mileage = int(anaflightdb.getMileage(city1,city2))
             except util.NullResultException:
                 mileage = getOnlineMileage(data[1],data[2])
-            Queue.put([data[0],mileage])
+            print('start to put data into queue' + str(data[0]) + ' ' + str(mileage))
+            communicationQueue.put([data[0],mileage])
+            print(communicationQueue.qsize())
         except util.QueryException as qe:
-            qe.log()
+            print('query exception')
+            util.logutil('ANAFlightExceptionLog.txt').log(str = str(qe.args),header = str(qe.__class__))
         except IndexError:
+            print('index error')
             util.ANAFlightException("Unknow Exception occured for city "+ str(data))
-        except Exception as E:
-            print(E)
+        # except Exception as E:
+        #     print(E.__class__)
+        #     print(E)
 
     communicationQueue.put(_sentinel)
