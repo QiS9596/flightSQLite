@@ -75,7 +75,7 @@ class node:
     if earlyTo(history.currentDatetime,flight.departureTime):
         self.flightHistory = history.flightHistory[:]
         self.flightHistory.append(flight)
-        self.val += flight.Mileage
+        self.val += int(float(flight.Mileage))
         self.currentDatetime = flight.arrivalTime
         self.currentairport = city(flight.destination)
   def __lt__(self, other):

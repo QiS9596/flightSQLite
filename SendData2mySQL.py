@@ -135,3 +135,7 @@ class City_Airport_mySQLManager:
 
     def check_existence(self,city_name,ICAL,IATA):
         pass
+
+class MileageDBManager():
+    def __init__(self):
+        pass

@@ -93,26 +93,29 @@ def fillMileageChart():
         i+=1
         global mileage
         mileage = 'NULL'
-        #print(data)
         print(str(i)+'/'+str(j))
-        try:
-            try:
-                city1 = getMatchedCity(db, data[1])[0][1].lower()
-                city2 = getMatchedCity(db, data[2])[0][1].lower()
-                mileage = int(anaflightdb.getMileage(city1,city2))
-            except util.NullResultException:
-                mileage = getOnlineMileage(data[1],data[2])
-            print('start to put data into queue' + str(data[0]) + ' ' + str(mileage))
-            communicationQueue.put([data[0],mileage])
-            print(communicationQueue.qsize())
-        except util.QueryException as qe:
-            print('query exception')
-            util.logutil('ANAFlightExceptionLog.txt').log(str = str(qe.args),header = str(qe.__class__))
-        except IndexError:
-            print('index error')
-            util.ANAFlightException("Unknow Exception occured for city "+ str(data))
+        search(data,db,anaflightdb)
         # except Exception as E:
         #     print(E.__class__)
         #     print(E)
 
     communicationQueue.put(_sentinel)
+
+def search(data,db,anaflightdb):
+    try:
+        try:
+            city1 = getMatchedCity(db, data[1])[0][1].lower()
+            city2 = getMatchedCity(db, data[2])[0][1].lower()
+            mileage = int(anaflightdb.getMileage(city1, city2))
+        except util.NullResultException:
+            mileage = getOnlineMileage(data[1], data[2])
+        print('start to put data into queue' + str(data[0]) + ' ' + str(mileage))
+        communicationQueue.put([data[0], mileage])
+        print(communicationQueue.qsize())
+    except util.QueryException as qe:
+        print('query exception')
+        util.logutil('ANAFlightExceptionLog.txt').log(str=str(qe.args), header=str(qe.__class__))
+    except IndexError:
+        print('index error')
+        util.ANAFlightException("Unknow Exception occured for city " + str(data))
+
