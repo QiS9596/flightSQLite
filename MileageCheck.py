@@ -69,9 +69,10 @@ def getOnlineMileage(IATA1,IATA2):
 
 communicationQueue = Queue()
 _sentinel = object()
+dbm = SendData2mySQL.mySQLFlightManager()
 
 def databaseManagerThreadFunc():
-    dbm = SendData2mySQL.mySQLFlightManager()
+
     print("database Manager Thread initiated")
     while True:
         if not communicationQueue.qsize()==0:
@@ -91,17 +92,34 @@ def fillMileageChart():
     j = len(result)
     for data in result:
         i+=1
-        global mileage
+
         mileage = 'NULL'
         print(str(i)+'/'+str(j))
-        search(data,db,anaflightdb)
-        # except Exception as E:
-        #     print(E.__class__)
-        #     print(E)
+        #search(data,db,anaflightdb)
+    result = getAllIllegalData(db)
+    if not len(result)==0:
+        print("Enter phase 2, checking Philippine Mileage")
+        j = len(result)
+        i = 0
+        for data in result:
+            i+=1
+            print(str(i)+'/'+str(j))
+            try:
+                print(data)
+                mileage = dbm.checkPhilippineMileage(data[1],data[2])
+                print([data[0],mileage])
+                communicationQueue.put([data[0],mileage])
+            except util.NullResultException:
+                print('ne')
+                print(data)
+            except AttributeError:
+                print('ae')
+                print(data)
 
     communicationQueue.put(_sentinel)
 
 def search(data,db,anaflightdb):
+    global mileage
     try:
         try:
             city1 = getMatchedCity(db, data[1])[0][1].lower()
