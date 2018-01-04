@@ -73,7 +73,7 @@ cursor = db.cursor()
 class mySQLFlightManager:
     def __init__(self):
         pass
-
+    lock = False
     def getCityNameList(self):
         """
         get the entire list of cities or airports
@@ -82,9 +82,13 @@ class mySQLFlightManager:
         pass
 
     def insertNewFlight(self,depatureCity, arrivalCity, depatureTime, arrivalTime, mileage, FlightNO):
+        while self.lock:
+            pass
+        self.lock = True
         sql = 'INSERT INTO airline(ID, DepartureAirport, ArriveAirport, DepartureTime, ArriveTime, kilos) VALUES(\'%s\',\'%s\',\'%s\',\'%s\',\'%s\',\'%s\')'%(FlightNO,depatureCity,arrivalCity,depatureTime,arrivalTime,mileage)
         cursor.execute(sql)
         db.commit()
+        self.lock = False
 
     def getAvaliableFlightList(self, depature_city_name):
         """
@@ -92,6 +96,10 @@ class mySQLFlightManager:
         :param depature_city_name: the name of the current city
         :return: a list or tuple of flight
         """
+        while self.lock:
+            pass
+        self.lock = True
+
         city = depature_city_name.lower()
         sql = 'SELECT * FROM airline WHERE DepartureAirport = \'%s\''%(city)
         cursor.execute(sql)
@@ -99,6 +107,7 @@ class mySQLFlightManager:
         result = []
         for flight in query_result:
             result.append([flight[1],flight[2],flight[3],flight[4],flight[5],flight[0]])
+        self.lock = False
         return result
 
     def flightInDatabase(self, FlightNO):
@@ -107,30 +116,51 @@ class mySQLFlightManager:
         :param FlightNO:the flight number of the flight we want to check
         :return: True is that flight is in the database, False if not
         """
+        while self.lock:
+            pass
+        self.lock = True
+
         sql = 'SELECT * FROM airline'
         cursor.execute(sql)
         query_result = cursor.fetchall()
         for flight in query_result:
             if flight[0] == FlightNO:
+                self.lock = False
                 return True
+        self.lock = False
         return False
 
     def updateInfo(self,ID, kilos):
+        while self.lock:
+            pass
+        self.lock = True
+
         sql = """UPDATE airline SET kilos = %s WHERE ID = \'%s\'"""%(str(kilos),ID)
         print(sql)
         cursor.execute(sql)
         db.commit()
+        self.lock = False
 
     def uploadPhilippineMileage(self,IATA1,IATA2,Mileage):
+        while self.lock:
+            pass
+        self.lock = True
         try:
+            self.lock = False
             self.checkPhilippineMileage(IATA1,IATA2)
+
             return
         except util.NullResultException:
+            self.lock = True
             sql = """INSERT INTO MileagePhilippine(IATA1,IATA2,Mileage) VALUES(\'%s\',\'%s\',%d)""" % (IATA1,IATA2,Mileage)
             cursor.execute(sql)
             db.commit()
+            self.lock = False
 
     def checkPhilippineMileage(self,IATA1,IATA2):
+        while self.lock:
+            pass
+        self.lock = True
         sql = """SELECT * FROM MileagePhilippine WHERE IATA1 = \'%s\' AND IATA2 = \'%s\' """%(IATA1,IATA2)
         sql2 = """SELECT * FROM MileagePhilippine WHERE IATA1 = \'%s\' AND IATA2 = \'%s\' """%(IATA2,IATA1)
         cursor.execute(sql)
@@ -138,7 +168,9 @@ class mySQLFlightManager:
         cursor.execute(sql2)
         query_result += cursor.fetchall()
         if len(query_result) == 0:
+            self.lock = False
             raise util.NullResultException
+        self.lock = False
         return query_result[0][2]
 
 
