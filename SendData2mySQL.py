@@ -121,6 +121,27 @@ class mySQLFlightManager:
         cursor.execute(sql)
         db.commit()
 
+    def uploadPhilippineMileage(self,IATA1,IATA2,Mileage):
+        try:
+            self.checkPhilippineMileage(IATA1,IATA2)
+            return
+        except util.NullResultException:
+            sql = """INSERT INTO MileagePhilippine(IATA1,IATA2,Mileage) VALUES(\'%s\',\'%s\',%d)""" % (IATA1,IATA2,Mileage)
+            cursor.execute(sql)
+            db.commit()
+
+    def checkPhilippineMileage(self,IATA1,IATA2):
+        sql = """SELECT * FROM MileagePhilippine WHERE IATA1 = \'%s\' AND IATA2 = \'%s\' """%(IATA1,IATA2)
+        sql2 = """SELECT * FROM MileagePhilippine WHERE IATA1 = \'%s\' AND IATA2 = \'%s\' """%(IATA2,IATA1)
+        cursor.execute(sql)
+        query_result = cursor.fetchall()
+        cursor.execute(sql2)
+        query_result += cursor.fetchall()
+        if len(query_result) == 0:
+            raise util.NullResultException
+        return query_result[0][2]
+
+
 
 class City_Airport_mySQLManager:
     table_name = 'CITY_AIRPORT'

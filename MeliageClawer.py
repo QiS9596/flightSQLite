@@ -3,6 +3,8 @@ from urllib.request import urlopen
 import ssl
 import sql
 import re
+import SendData2mySQL
+import time
 """
 *"Tokyo" is used to indicate both Haneda and Narita airports while "Osaka" is used to indicate Itami, Kansai, and Kobe airports.
 """
@@ -36,11 +38,16 @@ def PhilippineAirline():
     bs = BeautifulSoup(html,'lxml')
     tablebody = bs.find("tbody")
     rows = tablebody.findAll(['tr'])
-    print(rows)
+    DBM = SendData2mySQL.mySQLFlightManager()
+    #print(rows)
     for row in rows:
         dataelements = list(row.findAll('td'))
         if len(dataelements) == 8:
             if len(dataelements[0].string) == len(dataelements[2].string) == 3:
                 print(dataelements[0].string + ' ' + dataelements[2].string + ' ' + dataelements[4].string)
-
-PhilippineAirline()
+                mileage = 0
+                try:
+                    mileage = int(dataelements[4].string)
+                except ValueError:
+                    mileage = 0
+                DBM.uploadPhilippineMileage(dataelements[0].string,dataelements[2].string,mileage)
